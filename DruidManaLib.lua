@@ -5,7 +5,7 @@ local _G = getfenv()
 
 local DruidManaLib = {}
 
-local BEAR_FORM_TEXTURE = "Interface\\Icons\\Ability_Racial_BearForm"
+local BEAR_FORM_TEXTURE = "Interface\\Icons\\Spell_Nature_WispSplode"
 local CAT_FORM_TEXTURE = "Interface\\Icons\\Ability_Druid_CatForm"
 local INNERVATE_TEXTURE = "Interface\\Icons\\Spell_Nature_Lightning"
 -- local RUNE_OF_METAMORPHOSIS_TEXTURE = "Interface\\Icons\\Inv_Misc_Rune_06"
@@ -32,15 +32,15 @@ local function calcManaRegen(isFiveSecRegen)
     return (base * multiplier) + DruidManaLib.db.equipBonus
 end
 
-local function getShiftManaCost()
+local function getShiftManaCost(max_mana)
     for form = 1, GetNumShapeshiftForms() do
         local icon = GetShapeshiftFormInfo(form)
 
         if icon and (icon == BEAR_FORM_TEXTURE or icon == CAT_FORM_TEXTURE) then
-            DruidManaLib.tooltip:SetShapeshift(form)
-            local text = _G["DruidManaLibTooltipTextLeft2"]:GetText()
-            local _, _, cost = string.find(text, "(%d+)")
-            if cost then return tonumber(cost) end
+            local int = UnitStat("player", 4);
+            local mana_from_int = math.min(20,int)+15*(int-math.min(20,int));
+            local base_mana = max_mana - mana_from_int;
+            return math.floor(0.35 * base_mana)
         end
     end
     return 0
@@ -215,7 +215,7 @@ function DruidManaLib:UpdatePowerType(skipShiftMana)
 end
 
 function DruidManaLib:UpdateShiftMana()
-    self.db.shiftMana = getShiftManaCost()
+    self.db.shiftMana = getShiftManaCost(self.db.maxMana)
     self.db.mana = math.max(self.db.mana - self.db.shiftMana, 0)
 end
 
