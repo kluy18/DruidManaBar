@@ -3,6 +3,7 @@
 # DruidManaBar
 
 Displays a mana bar when shapeshifted.
+Repo forked from wasn't working with turtleWoW, this does now
 
 ## Install
 
